@@ -4,8 +4,8 @@
 	var button1 = document.getElementById("button1");
 	var button2 = document.getElementById("button2");
 	var scoreboard = document.getElementById("scoreboard");
-	var $levelboard = $('#levelboard');
-	var $banner = $('div#banner');
+	var levelboard = document.getElementById("levelboard");
+	var banner = document.getElementById("banner");
 	var score = 0, level = 1, speed = 'slow';
 
 	// Disable right-click on document
@@ -14,14 +14,14 @@
 	});
 
 	// New speeds in $.fx.speeds
-	$.fx.speeds.slow = 200;
-	$.fx.speeds.medium = 100;
-	$.fx.speeds.fast = 50;
-	$.fx.speeds.insane = 10;
+	let slow = 200;
+	let medium = 100;
+	let fast = 50;
+	let insane = 10;
 
 	// center container/banner text on beginning of game 
 	$(window).on('resize', function() {
-		centerBanner($banner);
+		centerBanner(banner);
 		if (score === 0) centerContainer($container1);
 		if (score === 0) centerContainer($container2);
 	});
@@ -29,7 +29,9 @@
 	$(window).trigger('resize');
 
 	// initial banner animation
-	animateBanner($banner);
+	animateBanner(banner);
+
+	
 
 	addToScore = () => {
 		score++;
@@ -41,54 +43,42 @@
 		if ( (score === 10) || (score === 20) || (score === 30) ) {
 			// update level everywhere
 			level ++;
-			$levelboard.text('Level: ' + level);
-			$banner.find('div').text('Level ' + level);
+			levelboard.innerHTML = `Level: ${level}`;
 
 			// animateBanner with every level
-			animateBanner($banner, $container1);
+			animateBanner(banner, $container1);
 
 
 			if ( score === 10 ) {
 				speed = 'medium';
-				$levelboard.css({'background': '#FFC90E'});
+				levelboard.style.background = "#FFC90E";
 			} else if ( score === 20 ) {
 				speed = 'fast';
-				$levelboard.css({'background': 'orange'});
+				levelboard.style.background = "orange";
 			} else if ( score === 30 ) {
 				speed = 'insane';
-				$levelboard.css({'background': '#ED1C24'});
+				levelboard.style.background = "#ED1C24";
 			}
 
-			$levelboard.css({
-				'-webkit-background-clip': 'content-box',
-				'-moz-background-clip': 'content-box',
-				'background-clip': 'content-box'
-			});
+			levelboard.style.backgroundClip = "content-box";
 		}
 	};
 
 	// on button click
-	button1.addEventListener("mousedown", () => {
+	button1.addEventListener("click", () => {
 		addToScore();	
-		//var header = document.getElementById("whole-thing");
-		//var btns = header.getElementsByClassName("btn");
-		//or (var i = 0; i < btns.length; i++) {
-			//btns[i].addEventListener("click", function() {
-				var current = document.getElementsByClassName("active");
-				current[0].className = current[0].className.replace(" active", "");
-				this.className += " active";
-			//});
-		//}
+		button1.classList.toggle("active");
 	});
 
-	button2.addEventListener("mousedown", () => {
+	button2.addEventListener("click", () => {
 		addToScore();
+		button2.classList.toggle("active");
 	});
 	
 	function centerBanner (banner) {
-		var div = banner.children('div');
-		var h = ( banner.outerHeight() - div.height() ) / 2;
-		div.css('margin-top', h + 'px');
+		var div = banner.children;
+		var h = banner.offsetHeight / 2;
+		div[0].style.marginTop = h;
 	}
 
 	function centerContainer(container1) {
@@ -106,8 +96,41 @@
 	// 	}, 500);
 	// }
 
-	function animateBanner ($banner) {
-		$banner.fadeIn(400).delay(1000).fadeOut(400);
+	function fadeOut(element) {
+		var op = 1;  // initial opacity
+		var timer = setInterval(function () {
+			if (op <= 0.1){
+				clearInterval(timer);
+				element.style.display = 'none';
+			}
+			element.style.opacity = op;
+			element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+			op -= op * 0.1;
+		}, 10);
+	}
+
+	function fadeIn(element) {
+		var op = 0.1;  // initial opacity
+		element.style.display = 'block';
+		var timer = setInterval(function () {
+			if (op >= 1){
+				clearInterval(timer);
+			}
+			element.style.opacity = op;
+			element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+			op += op * 0.1;
+		}, 10);
+	}
+
+	function animateBanner (banner) {
+		fadeOut(banner);
+		//fadeIn(banner);
+		setTimeout(() => {
+			var current = document.getElementsByClassName("active");
+			//current.classList.toggle("active");
+			current[0].className = current[0].className.replace(" active", "");
+			this.className += " active";
+		}, slow);
 	}
 
 })(jQuery);
