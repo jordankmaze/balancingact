@@ -1,6 +1,6 @@
-(function($) {
-    var $container1 = $('#container1');
-    var $container2 = $('#container2');
+(function() {
+    var container1 = document.getElementById("container1");
+    var container2 = document.getElementById("container2");
     var button = document.getElementById("button");
     var scoreboard = document.getElementById("scoreboard");
     var levelboard = document.getElementById("levelboard");
@@ -9,48 +9,19 @@
         level = 1,
         speed = 'slow';
 
-    //JQUERY THAT NEEDS TO BE REMOVED
     // Disable right-click on document
-    $(document).bind("contextmenu", () => {
-        return false;
-    });
-    // center container/banner text on beginning of game 
-    $(window).on('resize', function() {
-        centerBanner(banner);
-        if (score === 0) centerContainer($container1);
-        if (score === 0) centerContainer($container2);
-    });
-    $(window).trigger('resize');
+    document.addEventListener('contextmenu', event => event.preventDefault());
 
-    function centerContainer(container1) {
-        container1.css({
-            'left': (window.innerWidth / 2 - container1.outerWidth() / 2) + 'px',
-            'top': (window.innerHeight / 2 - container1.outerHeight() / 2) + 'px'
-        });
+    function centerContainer(container) {
+        container.style.left = window.innerWidth / 2 - container.offsetWidth / 2;
+        container.style.top = window.innerHeight / 2 - container.offsetHeight / 2;
     }
 
-    // function animateScoreboard (scoreboard) {
-    // 	scoreboard.animate({
-    // 		'box-shadow': '-2px 2px 100px rgba(0,0,0,.3)'
-    // 	}, 100).animate({
-    // 		'box-shadow': '-2px 2px 10px rgba(0,0,0,.3)'
-    // 	}, 500);
-    // }
-    //END JQUERY
-
-
-    // New speeds in $.fx.speeds
+    // New speeds
     let slow = 2000;
-    let medium = 100;
-    let fast = 50;
-    let insane = 10;
-    // const gameSpeeds = {
-    //     slow = 200,
-    //     medium = 100,
-    //     fast = 50,
-    //     insane = 10
-    // }
-
+    let medium = 1000;
+    let fast = 500;
+    let insane = 250;
 
     //game play
     //level
@@ -63,13 +34,13 @@
     	failure restarts score
     	continue to next level with faster times
     */
-    startGame = () => {
+    startGame = (speed) => {
         setInterval(() => {
             var current = document.getElementsByClassName("btn");
             let btnSwitcher = Math.round(Math.random())
             current[btnSwitcher].classList.toggle("active");
             this.className += " active";
-        }, slow);
+        }, speed);
     }
 
 
@@ -99,17 +70,20 @@
             levelboard.innerHTML = `Level: ${level}`;
 
             // animateBanner with every level
-            animateBanner(banner, $container1);
+            animateBanner(banner, container1);
 
 
             if (score === 10) {
-                speed = 'medium';
+                speed = medium;
+                startGame(speed);
                 levelboard.style.background = "#FFC90E";
             } else if (score === 20) {
-                speed = 'fast';
+                speed = fast;
+                startGame(speed);
                 levelboard.style.background = "orange";
             } else if (score === 30) {
-                speed = 'insane';
+                speed = insane;
+                startGame(speed);
                 levelboard.style.background = "#ED1C24";
             }
 
@@ -150,9 +124,13 @@
     }
 
     function animateBanner(banner) {
+        centerBanner(banner);
+        if (score === 0) centerContainer(container1);
+        if (score === 0) centerContainer(container2);
         fadeOut(banner);
         //fadeIn(banner);
-        startGame();
+        startGame(slow);
+        
     }
 
-})(jQuery);
+})();
