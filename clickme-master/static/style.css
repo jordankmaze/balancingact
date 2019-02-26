@@ -95,6 +95,14 @@ div {
 	background-image:         radial-gradient(center center, circle, #F3DE49, #FFC90E) !important;
 }
 
+.game-over {
+	background-image: -webkit-radial-gradient(center center, circle, #b80f0A, #b80f0A) !important;
+	background-image:    -moz-radial-gradient(center center, circle, #b80f0A, #b80f0A) !important;
+	background-image:     -ms-radial-gradient(center center, circle, #b80f0A, #b80f0A) !important;
+	background-image:      -o-radial-gradient(center center, circle, #b80f0A, #b80f0A) !important;
+	background-image:         radial-gradient(center center, circle, #b80f0A, #b80f0A) !important;
+}
+
 #button1 {
 	width: 100px; height: 100px;
 	padding: 8px;
