@@ -39,11 +39,16 @@
     };
 
     isButtonLit = (btnSwitcher, current) => {
+        console.log(btnSwitcher);
+        console.log(current);
+
         isLit = current[btnSwitcher].classList.toggle("active");
+        console.log(isLit);
     }
 
     button1.addEventListener("click", () => {
-        if (isButtonLit() === true) {
+        let active = button1.classList.contains('active');
+        if (active === true) {
             addToScore();
             button1.classList.toggle("active");
         } else {
@@ -52,8 +57,10 @@
         }
     });
 
-    button2.addEventListener("click", () => {
-        if (isButtonLit() === true) {
+    button2.addEventListener("click", () => {        
+        let active = button2.classList.contains('active');
+
+        if (active === true) {
             addToScore();
             button2.classList.toggle("active");
         } else {
@@ -64,11 +71,16 @@
 
     gameOver = () => {
         level = 1;
+        levelboard.innerHTML = `Level: ${level}`;
+
         score = 0;
+        scoreboard.innerHTML = `Score: ${score}`;
+
         button1.innerHTML = `GAME`;
         button2.innerHTML = `OVER`;
         button1.classList.toggle("game-over");
         button2.classList.toggle("game-over");
+
     }
 
     addToScore = () => {
@@ -83,7 +95,6 @@
 
             // animateBanner with every level
             animateBanner(banner, container1);
-
 
             if (score === 10) {
                 speed = medium;
@@ -154,7 +165,6 @@
         if (score === 0) centerContainer(container2);
         fadeOut(banner);
         startGame(slow);
-
     }
 
 })();
