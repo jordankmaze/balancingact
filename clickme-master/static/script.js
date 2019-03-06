@@ -1,6 +1,7 @@
 (function() {
     let container1 = document.getElementById("container1");
     let container2 = document.getElementById("container2");
+    let wholeThing = document.getElementById("whole-thing");
     let button1 = document.getElementById("button1");
     let button2 = document.getElementById("button2");
     let scoreboard = document.getElementById("scoreboard");
@@ -22,65 +23,86 @@
 
     function centerContainer(container) {
         container.style.left = window.innerWidth / 2 - container.offsetWidth / 2;
+        console.log(container.style.left);
         container.style.top = window.innerHeight / 2 - container.offsetHeight / 2;
+        console.log(container.style.top);
     }
 
-    startGame = (speed) => {
-        setInterval(() => {
-            var current = document.getElementsByClassName("btn");
+    switchingLitButton = () => {
+        let current = document.getElementsByClassName("btn");
 
-            while (btnSwitcher === lastRandomBtn) {
-                btnSwitcher = Math.round(Math.random());
-            }
-            lastRandomBtn = btnSwitcher;
+        while (btnSwitcher === lastRandomBtn) {
+            btnSwitcher = Math.round(Math.random());
+        }
+        lastRandomBtn = btnSwitcher;
 
-            isButtonLit(btnSwitcher, current)
-        }, speed);
+        isButtonLit(btnSwitcher, current)
     };
 
-    isButtonLit = (btnSwitcher, current) => {
-        console.log(btnSwitcher);
-        console.log(current);
+    
 
+    startGame = (speed) => {        
+
+        button1.innerHTML = `Click`;
+        button2.innerHTML = `Click`;
+        if (button1.classList.contains("game-over") || button2.classList.contains("game-over")) {
+            button1.classList.toggle("game-over");
+            button2.classList.toggle("game-over");
+        }
+        repeatBtnLight = setInterval(switchingLitButton, speed);
+    };
+
+    
+
+    isButtonLit = (btnSwitcher, current) => {
         isLit = current[btnSwitcher].classList.toggle("active");
-        console.log(isLit);
     }
 
     button1.addEventListener("click", () => {
         let active = button1.classList.contains('active');
+        let restartGame = button1.classList.contains('game-over');
         if (active === true) {
             addToScore();
             button1.classList.toggle("active");
+        } else if (restartGame === true) {
+            startGame(slow);
         } else {
             gameOver();
-            startGame(slow);
         }
     });
 
     button2.addEventListener("click", () => {        
         let active = button2.classList.contains('active');
-
+        let restartGame = button2.classList.contains('game-over');
         if (active === true) {
             addToScore();
             button2.classList.toggle("active");
+        } else if (restartGame === true) {
+            startGame(slow);
+            clearInterval(repeatBtnLight);
+
         } else {
             gameOver();
-            startGame(slow);
         }
     });
 
     gameOver = () => {
         level = 1;
         levelboard.innerHTML = `Level: ${level}`;
-
         score = 0;
         scoreboard.innerHTML = `Score: ${score}`;
 
         button1.innerHTML = `GAME`;
         button2.innerHTML = `OVER`;
+        if (button1.classList) {
+            console.log(button1.classList)
+        }
+        button1.classList.remove("active");
         button1.classList.toggle("game-over");
+        button2.classList.remove("active");
         button2.classList.toggle("game-over");
 
+        clearInterval(repeatBtnLight);
     }
 
     addToScore = () => {
@@ -141,7 +163,7 @@
             element.style.opacity = op;
             element.style.filter = 'alpha(opacity=' + op * 100 + ")";
             op -= op * 0.1;
-        }, 10);
+        }, 100);
     }
 
     function fadeIn(element) {
@@ -163,6 +185,7 @@
         centerBanner(banner);
         if (score === 0) centerContainer(container1);
         if (score === 0) centerContainer(container2);
+        if (score === 0) centerContainer(wholeThing);
         fadeOut(banner);
         startGame(slow);
     }
