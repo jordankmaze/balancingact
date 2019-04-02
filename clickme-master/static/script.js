@@ -1,30 +1,27 @@
 (function() {
-    let container1 = document.getElementById("container1");
-    let container2 = document.getElementById("container2");
-    let wholeThing = document.getElementById("whole-thing");
-    let button1 = document.getElementById("button1");
-    let button2 = document.getElementById("button2");
-    let scoreboard = document.getElementById("scoreboard");
-    let levelboard = document.getElementById("levelboard");
-    let banner = document.getElementById("banner");
-    let score = 0,
-        level = 1,
-        speed = 'slow';
-    //Speeds
-    let slow = 2000;
-    let medium = 1500;
-    let fast = 1000;
-    let insane = 500;
-    let btnSwitcher = 0;
-    let lastRandomBtn = 0;
+    let container1 = document.getElementById("container1"),
+    container2 = document.getElementById("container2"),
+    button1 = document.getElementById("button1"),
+    button2 = document.getElementById("button2"),
+    scoreboard = document.getElementById("scoreboard"),
+    levelboard = document.getElementById("levelboard"),
+    banner = document.getElementById("banner"),
+    elementsArray = document.querySelectorAll("button"),
+    score = 0, 
+    level = 1, 
+    speed = 2000, 
+    btnSwitcher = 0,
+    lastRandomBtn = 0;
 
     // Disable right-click on document
     document.addEventListener('contextmenu', event => event.preventDefault());
 
-    function centerContainer(container) {
-        container.style.left = window.innerWidth / 2 - container.offsetWidth / 2;
+    centerContainer = (container) => {
+        let sizeW = (window.innerWidth / 2) - (container.offsetWidth / 2);
+        container.style.left = sizeW + "px";
         console.log(container.style.left);
-        container.style.top = window.innerHeight / 2 - container.offsetHeight / 2;
+        let sizeH = (window.innerHeight / 2)- (container.offsetHeight / 2);
+        container.style.top = sizeH + "px";
         console.log(container.style.top);
     }
 
@@ -39,10 +36,7 @@
         isButtonLit(btnSwitcher, current)
     };
 
-    
-
     startGame = (speed) => {        
-
         button1.innerHTML = `Click`;
         button2.innerHTML = `Click`;
         if (button1.classList.contains("game-over") || button2.classList.contains("game-over")) {
@@ -50,40 +44,26 @@
             button2.classList.toggle("game-over");
         }
         repeatBtnLight = setInterval(switchingLitButton, speed);
-    };
-
-    
+    }
 
     isButtonLit = (btnSwitcher, current) => {
         isLit = current[btnSwitcher].classList.toggle("active");
     }
 
-    button1.addEventListener("click", () => {
-        let active = button1.classList.contains('active');
-        let restartGame = button1.classList.contains('game-over');
-        if (active === true) {
-            addToScore();
-            button1.classList.toggle("active");
-        } else if (restartGame === true) {
-            startGame(slow);
-        } else {
-            gameOver();
-        }
-    });
-
-    button2.addEventListener("click", () => {        
-        let active = button2.classList.contains('active');
-        let restartGame = button2.classList.contains('game-over');
-        if (active === true) {
-            addToScore();
-            button2.classList.toggle("active");
-        } else if (restartGame === true) {
-            startGame(slow);
-            clearInterval(repeatBtnLight);
-
-        } else {
-            gameOver();
-        }
+    elementsArray.forEach(function(elem) {
+        elem.addEventListener("click", () => {
+            let active = elem.classList.contains('active');
+            let restartGame = elem.classList.contains('game-over');
+            if (active === true) {
+                addToScore();
+                elem.classList.toggle("active");
+            } else if (restartGame === true) {
+                startGame(speed);
+                clearInterval(repeatBtnLight);
+            } else {
+                gameOver();
+            }
+        });
     });
 
     gameOver = () => {
@@ -119,22 +99,22 @@
             animateBanner(banner, container1);
 
             if (score === 10) {
-                speed = medium;
+                speed = speed * .2;
                 startGame(speed);
                 levelboard.style.background = "#FFC90E";
             } else if (score === 20) {
-                speed = fast;
+                speed = speed * .2;
                 startGame(speed);
                 levelboard.style.background = "orange";
             } else if (score === 30) {
-                speed = insane;
+                speed = ispeed * .2;
                 startGame(speed);
                 levelboard.style.background = "#ED1C24";
             }
 
             levelboard.style.backgroundClip = "content-box";
         }
-    };
+    }
 
     enableBtn = (isButtonLit) => {
         //let isButtonLit = current[btnSwitcher].classList.toggle("active");
@@ -185,9 +165,7 @@
         centerBanner(banner);
         if (score === 0) centerContainer(container1);
         if (score === 0) centerContainer(container2);
-        if (score === 0) centerContainer(wholeThing);
         fadeOut(banner);
-        startGame(slow);
+        startGame(speed);
     }
-
 })();
