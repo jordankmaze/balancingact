@@ -3,9 +3,20 @@
     button1 = document.getElementById("button1"), button2 = document.getElementById("button2"),
     scoreboard = document.getElementById("scoreboard"), levelboard = document.getElementById("levelboard"),
     banner = document.getElementById("banner"), elementsArray = document.querySelectorAll("button"),
-    score = 5, level = 1, speed = 2000, btnSwitcher = 0, lastRandomBtn = 0, repeatBtnLight = 0;
+    previousResults = document.getElementById("previousResults"),
+    btnSwitcher = 0, lastRandomBtn = 0, repeatBtnLight = 0;
 
-    function switchingLitButton() {
+    let gameStatus = {
+        speed : 2000,
+        isGameGoing : true,
+        score : 9,
+        level : 1,
+        addSpeed : function(newSpeed){
+            return this.speed = newSpeed * .9;
+        }
+    };
+
+    switchingLitButton = () => {
         let current = document.getElementsByClassName("btn");
         while (btnSwitcher === lastRandomBtn) {
             btnSwitcher = Math.round(Math.random());
@@ -15,38 +26,50 @@
         isButtonLit(btnSwitcher, current);
     }
 
-    function start(speed) {  // use a one-off timer
-        if (repeatBtnLight !== 0) return;
-        repeatBtnLight = setInterval(switchingLitButton, speed);
+    isButtonLit = (btnSwitcher, current) => {
+        isLit = current[btnSwitcher].classList.toggle("active");
+    }
+
+    start = (speed) => {
+        console.log(gameStatus);
+
+        stop();
+        repeatBtnLight = setInterval(switchingLitButton, speed)
     };
 
-    function stop() {
+    stop = () => {
         clearTimeout(repeatBtnLight);
         repeatBtnLight = 0;
     };
 
-    startGame = (speed) => {
+    startGame = (gameStatus) => {
         button1.innerHTML = `Click`;
         button2.innerHTML = `Click`;
         if (button1.classList.contains("game-over") || button2.classList.contains("game-over")) {
             button1.classList.remove("game-over");
             button2.classList.remove("game-over");
         }
-        start(speed);
+        start(gameStatus.speed);
     }
 
-    isButtonLit = (btnSwitcher, current) => {
-        isLit = current[btnSwitcher].classList.toggle("active");
+    recordPreviousResult = () => {
+        previousResults.innerHTML = `Score: ${gameStatus.score} Level: ${gameStatus.level}`
     }
 
-    gameOver = () => {
+    gameOver = (gameStatus) => {
+
+        recordPreviousResult();
+
+        gameStatus.speed = 2000;
+        gameStatus.level = 1;
+        gameStatus.score = 0;
+
         stop();
 
-        level = 1;
-        levelboard.innerHTML = `Level: ${level}`;
-        score = 0;
-        scoreboard.innerHTML = `Score: ${score}`;
-        speed = 2000;
+        gameStatus.level = 1;
+        levelboard.innerHTML = `Level: ${gameStatus.level}`;
+        gameStatus.score = 0;
+        scoreboard.innerHTML = `Score: ${gameStatus.score}`;
 
         button1.innerHTML = `GAME`;
         button2.innerHTML = `OVER`;
@@ -57,49 +80,33 @@
         button2.classList.toggle("game-over");        
     }
 
-    addToScore = () => {
-        score++;
-        scoreboard.innerHTML = `Score: ${score}`;
-        console.log(speed);
-        changeLevel(score, speed);
+    addToScore = (gameStatus) => {
+        gameStatus.score++;
+        scoreboard.innerHTML = `Score: ${gameStatus.score}`;
+        changeLevel(gameStatus);
     }
 
-    changeLevel = (score, speed) => {
-        console.log(speed);
+    changeLevel = (gameStatus) => {
+        holderForPreviousScore = gameStatus.score;
 
-        if ((score === 10) || (score === 20) || (score === 30)) {
-            level++;
-            levelboard.innerHTML = `Level: ${level}`;
-            // animateBanner with every level
-            animateBanner(banner, container1);
+        if (gameStatus.score % 10 === 0) {
+            let levelNumber = gameStatus.level++;
+            levelboard.innerHTML = `Level: ${levelNumber}`;
 
-            if (score === 10) {
-                console.log(speed);
-
-                let newSpeed = increaseSpeed(speed);
-                startGame(newSpeed);
-                levelboard.style.background = "#FFC90E";
-            } else if (score === 20) {
-                console.log(speed);
-
-                let newSpeed = increaseSpeed(speed);
-                startGame(newSpeed);
-                levelboard.style.background = "orange";
-            } else if (score === 30) {
-                console.log(speed);
-
-                let newSpeed = increaseSpeed(speed);
-                startGame(newSpeed);
-                levelboard.style.background = "#ED1C24";
+            if (gameStatus.score % 10 === 0) {
+                let fasterSpeed = gameStatus.addSpeed(gameStatus.speed);
+                start(fasterSpeed);
+                changeLevelColor(levelNumber);
             }
-
-            levelboard.style.backgroundClip = "content-box";
+            animateBanner(banner);
+            //levelboard.style.backgroundClip = "content-box";
         }
     }
 
-    increaseSpeed = (speed) => {
-        speed = speed * 1.2;
-        return speed;
+    changeLevelColor = (levelNumber) => {
+        if (levelNumber % 2 === 0) {
+            levelboard.style.background = "#FFC90E";
+        }
     }
 
     centerBanner = (banner) => {
@@ -121,14 +128,11 @@
         }, 100);
     }
 
-    animateBanner = (banner, speed) => {
+    animateBanner = (banner) => {
         centerBanner(banner);
-        if (level === 1) centerContainer(container1);
-        if (level === 1) centerContainer(container2);
+        if (gameStatus.level === 1) centerContainer(container1);
+        if (gameStatus.level === 1) centerContainer(container2);
         fadeOut(banner);
-        console.log(speed);
-
-        startGame(speed);
     }
 
     centerContainer = (container) => {
@@ -140,24 +144,24 @@
         //console.log(container.style.top);
     }
 
-    animateBanner(banner, speed);
-
     elementsArray.forEach(function(elem) {
         elem.addEventListener("click", () => {
             let active = elem.classList.contains('active');
-            let restartGame = elem.classList.contains('game-over');
+            let restart = elem.classList.contains('game-over');
             if (active === true) {
-                addToScore();
+                addToScore(gameStatus);
                 elem.classList.remove("active");
-            } else if (restartGame === true) {
-                console.log(speed);
-                startGame(speed);
+            } else if (restart === true) {
+                startGame(gameStatus);
             } else {
-                gameOver();
+                gameOver(gameStatus);
             }
         });
     });
 
     // Disable right-click on document
     document.addEventListener('contextmenu', event => event.preventDefault());
+    //begin game
+    animateBanner(banner);
+    startGame(gameStatus);
 })();
